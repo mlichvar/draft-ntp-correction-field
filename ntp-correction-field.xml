@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC5905 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5905.xml">
+<!ENTITY RFC7821 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7821.xml">
+<!ENTITY RFC7822 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7822.xml">
+<!ENTITY NTS SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-ntp-using-nts-for-ntp.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<?rfc strict="yes"?>
+<?rfc toc="no"?>
+<?rfc tocdepth="3"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+
+<rfc category="exp" docName="draft-mlichvar-ntp-correction-field-00" ipr="trust200902">
+  <front>
+    <title>NTP Correction Field</title>
+
+    <author fullname="Miroslav Lichvar" initials="M." surname="Lichvar">
+      <organization>Red Hat</organization>
+      <address>
+        <postal>
+          <street>Purkynova 115</street>
+          <city>Brno</city>
+          <region></region>
+          <code>612 00</code>
+          <country>Czech Republic</country>
+        </postal>
+        <email>mlichvar@redhat.com</email>
+      </address>
+    </author>
+
+    <date year="2017" month="October" day="30"/>
+
+    <area>General</area>
+
+    <workgroup>Internet Engineering Task Force</workgroup>
+
+    <keyword>NTP</keyword>
+
+    <abstract>
+      <t>This document specifies an extension field for the Network Time
+        Protocol (NTP) which allows network devices such as switches and
+        routers to modify NTP packets with corrections to improve accuracy
+        of the synchronization in the network.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>Processing and queueing delays in network switches and routers may be
+        a significant source of jitter and asymmetry in network delay, which
+        has a negative impact on accuracy and stability of synchronization of
+        clocks in local networks using <xref target="RFC5905">NTP</xref>.</t>
+
+      <t>If all network devices on the paths between NTP clients and servers
+        implemented NTP and supported an operation as a server and client, the
+        impact of the delays could be avoided by configuring NTP to make
+        measurements only between devices and hosts that are directly connected
+        to one another. In the <xref target="IEEE1588">Precision Time Protocol
+          (PTP)</xref>, which is a different protocol for synchronization of
+        clocks in networks, such devices would be called Boundary Clocks
+        (BC).</t>
+
+      <t>A different approach supported by PTP to improve the accuracy uses
+        Transparent Clocks (TC). Instead of fully implementing PTP in order to
+        support an operation as a BC, the devices only modify a correction
+        field in forwarded PTP packets with the time that the packets had to
+        wait for transmission. The final value of the correction is included in
+        the calculation of the delay and offset, which may significantly
+        improve the accuracy and stability of the synchronization.</t>
+
+      <t>This document describes an NTP extension field which allows the
+        devices to make similar correction in forwarded NTP packets.</t>
+
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+          "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+          document are to be interpreted as described in <xref
+            target="RFC2119">RFC 2119</xref>.</t>
+      </section>
+    </section>
+
+    <section title="Format of Correction Field">
+      <t>The Correction Field is an NTP extension field following <xref
+          target="RFC7822">RFC 7822</xref>. The format of the extension field
+        is shown in Figure <xref format="counter"
+          target="correction-field-format"></xref>.</t>
+
+      <figure align="center" anchor="correction-field-format"
+          title="Format of Correction Field">
+        <artwork align="left"><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Field Type           |          Length (28)          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      Receive Correction       |      Transmit Correction      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                       Origin Correction                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                        Delay Correction                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Origin ID   |    Path ID    |     Checksum complement       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        ]]></artwork>
+      </figure>
+
+      <t>The extension field has the following fields:</t>
+
+      <t><list hangIndent="8" style="hanging">
+          <t hangText="Field Type"><vspace/>
+            The type which identifies the Correction extension field. TBD</t>
+
+          <t hangText="Length"><vspace/>
+            The length of the extension field, which is 28 octets.</t>
+
+          <t hangText="Receive Correction"><vspace/>
+            A 16-bit extension of the receive timestamp in the NTP header.</t>
+
+          <t hangText="Transmit Correction"><vspace/>
+            A 16-bit extension of the transmit timestamp in the NTP header.</t>
+
+          <t hangText="Origin Correction"><vspace/>
+            A field which contains a copy of the final delay correction from
+            the previous packet in the NTP exchange.</t>
+
+          <t hangText="Delay Correction"><vspace/>
+            A fixed point number with 16 unsigned integer bits and 48
+            fractional bits, which represents the current correction of the
+            network delay that has accumulated for this packet on the path from
+            the source to the destination.</t>
+
+          <t hangText="Origin ID"><vspace/>
+            A field which contains a copy of the final path ID from the
+            previous packet in the NTP exchange.</t>
+
+          <t hangText="Path ID"><vspace/>
+            An 8-bit identification number of the path where the delay
+            correction was updated.</t>
+
+          <t hangText="Checksum Complement"><vspace/>
+            A field which can be modified to not change the UDP checksum after
+            updating the other fields. The same field is described in <xref
+              target="RFC7821">RFC 7821</xref>.</t>
+      </list></t>
+    </section>
+
+    <section title="Network devices">
+      <t>A network device which is forwarding a packet and supports the
+        Correction Field MUST NOT modify the packet unless all of the following
+        applies:</t>
+
+      <t><list style="numbers">
+          <t>The packet is an IPv4 or IPv6 UDP packet.</t>
+          <t>The source port or destination port is 123.</t>
+          <t>The NTP version is 4.</t>
+          <t>The NTP mode is 1, 2, 3, 4, or 5.</t>
+          <t>The format of the packet is valid per RFC 7822.</t>
+          <t>The packet contains an extension field which has a type of TBD and
+            length of 28 octets.</t>
+      </list></t>
+
+      <t>The device SHOULD add to the delay correction field of the extension
+        field the time difference between the following points:</t>
+
+      <t><list style="numbers">
+          <t>The end of the reception (trailer timestamp).</t>
+          <t>The beginning of the transmission (preamble timestamp).</t>
+      </list></t>
+
+      <t>If the device updates the delay correction, it SHOULD also add the
+        identification numbers of the incoming and outgoing port to the path
+        ID.</t>
+
+      <t>The device MAY update the checksum complement field in order to keep
+        the UDP checksum valid.</t>
+
+      <t>TBD: Requirements on frequency accuracy of the clock.</t>
+    </section>
+
+    <section title="NTP hosts">
+      <t>When an NTP client sends a request to a server and the association is
+        configured to use the Correction Field, it SHOULD add the extension
+        field to the packet. All fields of the extension field except type and
+        length SHOULD be set to zero.</t>
+
+      <t>When the server receives a packet which includes the extension field,
+        the response SHOULD also include the extension field.</t>
+
+      <t>If the server's clock has a better precision than resolution of the
+        64-bit NTP timestamp format, the server SHOULD save the additional bits
+        in the receive and transmit correction fields and set the precision
+        field to the corresponding number, which is smaller than -32.
+        Otherwise, the receive and transmit correction fields SHOULD be
+        zero.</t>
+
+      <t>The origin correction and origin path ID SHOULD be set to the delay
+        correction and path ID from the request. The other fields of the
+        Correction Field SHOULD be zero.</t>
+
+      <t>When the client receives a response which contains the extension
+        field, it SHOULD check the value of both the origin and delay
+        correction fields. If a correction is larger than a specified maximum
+        (e.g. 1 second), the extension field SHOULD be ignored.</t>
+
+      <t>The client MAY log a warning if the origin ID and path ID are not
+        equal, which indicates the network path between the server and client
+        is not symmetric.</t>
+
+      <t>If the client's clock has a better precision than resolution of the
+        64-bit NTP format and the precision field in the response contains a
+        number smaller than -32, the client SHOULD extend the receive and
+        transmit timestamps with the additional bits in the receive and
+        transmit correction fields.</t>
+
+      <t>When the client computes the offset and delay using the formulas from
+        RFC 5905, the origin correction is substracted from the receive
+        timestamp and the delay correction is added to the transmit
+        timestamp.</t>
+
+      <t>TBD: Other modes.</t>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The Correction Field extension is based on the PTP correction field
+        specified in IEEE 1588-2008.</t>
+
+      <!--
+      <t>The author would like to thank ...</t>
+      -->
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>IANA is requested to allocate an Extension Field Type for the
+        Correction Field.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>Packets using the Correction Field cannot be authenticated by legacy
+        MACs, because network devices which are supposed to update the field do
+        not have access to the key.</t>
+
+      <t>Packets can be partially protected if the Correction Field is placed
+        in the packet after an authentication extension field, e.g. the <xref
+          target="I-D.ietf-ntp-using-nts-for-ntp">NTS Authenticator and
+          Encrypted Extensions extension field</xref>.</t>
+
+      <t>A man-in-the-middle attacker can delay packets in the network in order
+        to increase the measured delay and shift the measured offset by up to
+        half of the extra delay. If the packets contain the Correction Field,
+        the attacker can reduce the delay calculated by the client or peer and
+        shift the offset even more. The maximum correction should be limited
+        (e.g. to 1 second) to prevent the attacker from injecting a larger
+        offset to the measurements.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      &RFC2119;
+
+      &RFC5905;
+
+      &RFC7822;
+    </references>
+
+    <references title="Informative References">
+      <reference anchor="IEEE1588">
+        <front>
+          <title>IEEE Standard for a Precision Clock Synchronization Protocol
+            for Networked Measurement and Control Systems</title>
+          <author>
+            <organization>IEEE std. 1588-2008</organization>
+          </author>
+          <date year="2008"/>
+        </front>
+      </reference>
+
+      &RFC7821;
+
+      &NTS;
+    </references>
+  </back>
+</rfc>
