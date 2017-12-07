@@ -213,7 +213,7 @@
         Otherwise, the receive and transmit correction fields SHOULD be
         zero.</t>
 
-      <t>The origin correction and origin path ID SHOULD be set to the delay
+      <t>The origin correction and origin ID fields SHOULD be set to the delay
         correction and path ID from the request. The other fields of the
         Correction Field SHOULD be zero.</t>
 
@@ -229,15 +229,23 @@
       <t>If the client's clock has a better precision than resolution of the
         64-bit NTP format and the precision field in the response contains a
         number smaller than -32, the client SHOULD extend the receive and
-        transmit timestamps with the additional bits in the receive and
-        transmit correction fields.</t>
+        transmit timestamp from the NTP header with the additional bits from
+        the receive and transmit correction fields respectively.</t>
 
       <t>When the client computes the offset and delay using the formulas from
-        RFC 5905, the origin correction is substracted from the receive
+        RFC 5905, the origin correction is subtracted from the receive
         timestamp and the delay correction is added to the transmit
         timestamp.</t>
 
-      <t>TBD: Other modes.</t>
+      <t>An NTP peer follows the rules of both servers and clients. It
+        processes Correction Fields in received packets as a client and sends
+        Correction Fields as a server. A packet which has a zero origin
+        timestamp (i.e. it is not a response to a request) SHOULD have a zero
+        origin correction and zero origin ID in the Correction Field.
+      </t>
+
+      <t>A broadcast server using the Correction Field SHOULD always set the
+        origin correction and origin ID fields to zero.</t>
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
