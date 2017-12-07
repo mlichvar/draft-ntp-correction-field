@@ -123,17 +123,21 @@
             The length of the extension field, which is 28 octets.</t>
 
           <t hangText="Receive Correction"><vspace/>
-            A 16-bit extension of the receive timestamp in the NTP header.</t>
+            A 16-bit extension of the receive timestamp in the NTP header
+            increasing its resolution. The extended receive timestamp has 32
+            integer bits and 48 fractional bits.</t>
 
           <t hangText="Transmit Correction"><vspace/>
-            A 16-bit extension of the transmit timestamp in the NTP header.</t>
+            A 16-bit extension of the transmit timestamp in the NTP header
+            increasing its resolution. The extended transmit timestamp has 32
+            integer bits and 48 fractional bits.</t>
 
           <t hangText="Origin Correction"><vspace/>
             A field which contains a copy of the final delay correction from
             the previous packet in the NTP exchange.</t>
 
           <t hangText="Delay Correction"><vspace/>
-            A fixed point number with 16 unsigned integer bits and 48
+            A signed fixed-point number of seconds with 16 integer bits and 48
             fractional bits, which represents the current correction of the
             network delay that has accumulated for this packet on the path from
             the source to the destination.</t>
@@ -168,22 +172,29 @@
             length of 28 octets.</t>
       </list></t>
 
-      <t>The device SHOULD add to the delay correction field of the extension
-        field the time difference between the following points:</t>
+      <t>The device SHOULD add to the current value in the delay correction
+        field the length of an interval between the reception and transmission
+        of the packet. If the packet is transmitted at the same speed as it was
+        received and the length of the packet does not change (e.g. due to
+        adding or removing a VLAN tag), the beginning and end of the interval
+        may correspond to any point of the reception and transmission as long
+        as it is consistent for all forwarded packets of the same length. If
+        the transmission speed or length of the packet is different, the
+        beginning and end of the interval SHOULD correspond to the end of the
+        reception and beginning of the transmission respectively.</t>
 
-      <t><list style="numbers">
-          <t>The end of the reception (trailer timestamp).</t>
-          <t>The beginning of the transmission (preamble timestamp).</t>
-      </list></t>
+      <t>If the transmission starts before the reception ends, a negative value
+        may need to be added to the delay correction. The end of the reception
+        SHOULD be determined using the length field of the UDP header and the
+        speed at which the packet is received.</t>
 
       <t>If the device updates the delay correction, it SHOULD also add the
         identification numbers of the incoming and outgoing port to the path
         ID.</t>
 
-      <t>The device MAY update the checksum complement field in order to keep
-        the UDP checksum valid.</t>
-
-      <t>TBD: Requirements on frequency accuracy of the clock.</t>
+      <t>If the device modified any field of the extension field, it MUST
+        update the checksum complement field in order to keep the current UDP
+        checksum valid, or update the UDP checksum itself.</t>
     </section>
 
     <section title="NTP hosts">
@@ -233,9 +244,8 @@
       <t>The Correction Field extension is based on the PTP correction field
         specified in IEEE 1588-2008.</t>
 
-      <!--
-      <t>The author would like to thank ...</t>
-      -->
+      <t>The author would like to thank Tal Mizrahi for his useful
+        comments.</t>
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
@@ -244,14 +254,16 @@
     </section>
 
     <section anchor="Security" title="Security Considerations">
-      <t>Packets using the Correction Field cannot be authenticated by legacy
-        MACs, because network devices which are supposed to update the field do
-        not have access to the key.</t>
+      <t>NTP packets including the Correction Field cannot be authenticated
+        by a legacy MAC, because the MAC has to cover all extension fields in
+        the packet and devices which are supposed to modify the field are not
+        able to update the MAC.</t>
 
-      <t>Packets can be partially protected if the Correction Field is placed
-        in the packet after an authentication extension field, e.g. the <xref
+      <t>It is recommended to authenticate NTP packets using an authentication
+        extension field, e.g. the <xref
           target="I-D.ietf-ntp-using-nts-for-ntp">NTS Authenticator and
-          Encrypted Extensions extension field</xref>.</t>
+          Encrypted Extensions</xref> extension field, and add the Correction
+        Field to the packet after the authentication field.</t>
 
       <t>A man-in-the-middle attacker can delay packets in the network in order
         to increase the measured delay and shift the measured offset by up to
