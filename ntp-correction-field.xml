@@ -98,15 +98,15 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |          Field Type           |          Length (28)          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      Receive Correction       |      Transmit Correction      |
+|                           Reserved                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
+| Receive Corr. | Transmit Corr.|           Reserved            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                       Origin Correction                       |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                        Delay Correction                       |
-|                                                               |
++                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+|                       Delay Correction                        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |   Origin ID   |    Path ID    |     Checksum complement       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -123,21 +123,21 @@
             The length of the extension field, which is 28 octets.</t>
 
           <t hangText="Receive Correction"><vspace/>
-            A 16-bit extension of the receive timestamp in the NTP header
+            An 8-bit extension of the receive timestamp in the NTP header
             increasing its resolution. The extended receive timestamp has 32
-            integer bits and 48 fractional bits.</t>
+            integer bits and 40 fractional bits.</t>
 
           <t hangText="Transmit Correction"><vspace/>
-            A 16-bit extension of the transmit timestamp in the NTP header
+            An 8-bit extension of the transmit timestamp in the NTP header
             increasing its resolution. The extended transmit timestamp has 32
-            integer bits and 48 fractional bits.</t>
+            integer bits and 40 fractional bits.</t>
 
           <t hangText="Origin Correction"><vspace/>
             A field which contains a copy of the final delay correction from
             the previous packet in the NTP exchange.</t>
 
           <t hangText="Delay Correction"><vspace/>
-            A signed fixed-point number of seconds with 16 integer bits and 48
+            A signed fixed-point number of seconds with 8 integer bits and 40
             fractional bits, which represents the current correction of the
             network delay that has accumulated for this packet on the path from
             the source to the destination.</t>
@@ -252,8 +252,8 @@
       <t>The Correction Field extension is based on the PTP correction field
         specified in IEEE 1588-2008.</t>
 
-      <t>The author would like to thank Tal Mizrahi for his useful
-        comments.</t>
+      <t>The author would like to thank Tal Mizrahi and Harlan Stenn for their
+        useful comments.</t>
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
