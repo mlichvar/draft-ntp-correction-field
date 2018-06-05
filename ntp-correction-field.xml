@@ -100,7 +100,7 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           Reserved                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Receive Corr. | Transmit Corr.|           Reserved            |
+| Receive Corr. | Transmit Corr.|           Origin ID           |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                       Origin Correction                       |
 +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -108,7 +108,7 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
 |                       Delay Correction                        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|   Origin ID   |    Path ID    |     Checksum complement       |
+|            Path ID            |     Checksum complement       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         ]]></artwork>
       </figure>
@@ -132,6 +132,10 @@
             increasing its resolution. The extended transmit timestamp has 32
             integer bits and 40 fractional bits.</t>
 
+          <t hangText="Origin ID"><vspace/>
+            A field which contains a copy of the final path ID from the
+            previous packet in the NTP exchange.</t>
+
           <t hangText="Origin Correction"><vspace/>
             A field which contains a copy of the final delay correction from
             the previous packet in the NTP exchange.</t>
@@ -142,12 +146,8 @@
             network delay that has accumulated for this packet on the path from
             the source to the destination.</t>
 
-          <t hangText="Origin ID"><vspace/>
-            A field which contains a copy of the final path ID from the
-            previous packet in the NTP exchange.</t>
-
           <t hangText="Path ID"><vspace/>
-            An 8-bit identification number of the path where the delay
+            A 16-bit identification number of the path where the delay
             correction was updated.</t>
 
           <t hangText="Checksum Complement"><vspace/>
