@@ -98,7 +98,7 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |          Field Type           |          Length (28)          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                           Reserved                            |
+|     Root Delay Correction     |  Root Dispersion Correction   |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 | Receive Corr. | Transmit Corr.|           Origin ID           |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -121,6 +121,16 @@
 
           <t hangText="Length"><vspace/>
             The length of the extension field, which is 28 octets.</t>
+
+          <t hangText="Root Delay Correction"><vspace/>
+            A 16-bit extension of the root delay in the NTP header
+            increasing its resolution. The extended root delay has 16
+            integer bits and 32 fractional bits.</t>
+
+          <t hangText="Root Dispersion Correction"><vspace/>
+            A 16-bit extension of the root dispersion in the NTP header
+            increasing its resolution. The extended root dispersion has 16
+            integer bits and 32 fractional bits.</t>
 
           <t hangText="Receive Correction"><vspace/>
             An 8-bit extension of the receive timestamp in the NTP header
@@ -206,6 +216,12 @@
       <t>When the server receives a packet which includes the extension field,
         the response SHOULD also include the extension field.</t>
 
+      <t>The server SHOULD use the root delay and root dispersion correction
+        fields to save additional bits of the root delay and dispersion below
+        the resolution of the 32-bit fixed-point fields in the NTP header. These
+        corrections allow the server to provide the client with root delay and
+        root dispersion in resolution of about 1/4 of a nanosecond.</t>
+
       <t>If the server's clock has a better precision than resolution of the
         64-bit NTP timestamp format, the server SHOULD save the additional bits
         in the receive and transmit correction fields and set the precision
@@ -225,6 +241,10 @@
       <t>The client MAY log a warning if the origin ID and path ID are not
         equal, which indicates the network path between the server and client
         is not symmetric.</t>
+
+      <t>The client SHOULD extend the root delay and root dispersion from the NTP
+        header with bits from the root delay and root dispersion correction
+        fields respectively.</t>
 
       <t>If the client's clock has a better precision than resolution of the
         64-bit NTP format and the precision field in the response contains a
