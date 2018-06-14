@@ -100,11 +100,11 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |     Root Delay Correction     |  Root Dispersion Correction   |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Receive Corr. | Transmit Corr.|           Origin ID           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Receive Corr. | Transmit Corr.|                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
 |                       Origin Correction                       |
-+                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Origin ID           |                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
 |                       Delay Correction                        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -142,13 +142,13 @@
             increasing its resolution. The extended transmit timestamp has 32
             integer bits and 40 fractional bits.</t>
 
-          <t hangText="Origin ID"><vspace/>
-            A field which contains a copy of the final path ID from the
-            previous packet in the NTP exchange.</t>
-
           <t hangText="Origin Correction"><vspace/>
             A field which contains a copy of the final delay correction from
             the previous packet in the NTP exchange.</t>
+
+          <t hangText="Origin ID"><vspace/>
+            A field which contains a copy of the final path ID from the
+            previous packet in the NTP exchange.</t>
 
           <t hangText="Delay Correction"><vspace/>
             A signed fixed-point number of seconds with 8 integer bits and 40
