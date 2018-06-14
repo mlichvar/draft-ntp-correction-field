@@ -43,18 +43,19 @@
 
     <abstract>
       <t>This document specifies an extension field for the Network Time
-        Protocol (NTP) which allows network devices such as switches and
-        routers to modify NTP packets with corrections to improve accuracy
-        of the synchronization in the network.</t>
+        Protocol (NTP) which improves resolution of specific fields in the
+        NTP header and allows network devices such as switches and routers
+        to modify NTP packets with corrections to improve accuracy of the
+        synchronization in the network.</t>
     </abstract>
   </front>
 
   <middle>
     <section title="Introduction">
       <t>Processing and queueing delays in network switches and routers may be
-        a significant source of jitter and asymmetry in network delay, which
-        has a negative impact on accuracy and stability of synchronization of
-        clocks in local networks using <xref target="RFC5905">NTP</xref>.</t>
+        a significant source of jitter and asymmetry in network delay, which has
+        a negative impact on accuracy and stability of clocks synchronized by
+        <xref target="RFC5905">NTP</xref>.</t>
 
       <t>If all network devices on the paths between NTP clients and servers
         implemented NTP and supported an operation as a server and client, the
@@ -62,8 +63,7 @@
         measurements only between devices and hosts that are directly connected
         to one another. In the <xref target="IEEE1588">Precision Time Protocol
           (PTP)</xref>, which is a different protocol for synchronization of
-        clocks in networks, such devices would be called Boundary Clocks
-        (BC).</t>
+        clocks in networks, such devices are called Boundary Clocks (BC).</t>
 
       <t>A different approach supported by PTP to improve the accuracy uses
         Transparent Clocks (TC). Instead of fully implementing PTP in order to
@@ -74,7 +74,12 @@
         improve the accuracy and stability of the synchronization.</t>
 
       <t>This document describes an NTP extension field which allows the
-        devices to make similar correction in forwarded NTP packets.</t>
+        devices to make a similar correction in forwarded NTP packets.</t>
+
+      <t>To better support a highly accurate synchronization, the extension
+        field also improves resolution of the following fields in the NTP
+        header: root delay, root dispersion, receive timestamp, transmit
+        timestamp.</t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
