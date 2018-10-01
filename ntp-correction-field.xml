@@ -156,9 +156,10 @@
             correction was updated.</t>
 
           <t hangText="Checksum Complement"><vspace/>
-            A field which can be modified to not change the UDP checksum after
-            updating the other fields. The same field is described in <xref
-              target="RFC7821">RFC 7821</xref>.</t>
+            A field which can be modified in order to keep the UDP checksum of
+            the packet valid. This allows the UDP checksum to be transmitted
+            before the Correction Field is received and modified. The same field
+            is described in <xref target="RFC7821">RFC 7821</xref>.</t>
       </list></t>
     </section>
 
