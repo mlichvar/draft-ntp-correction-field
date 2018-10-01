@@ -102,15 +102,15 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |          Field Type           |          Length (28)          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Reserved            |           Reserved            |
+|                                                               |
++                       Origin Correction                       +
+|                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Receive Corr. | Transmit Corr.|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
-|                       Origin Correction                       |
+|           Origin ID           | Receive Corr. | Transmit Corr.|
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Origin ID           |                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
-|                       Delay Correction                        |
+|                                                               |
++                       Delay Correction                        +
+|                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |            Path ID            |     Checksum complement       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -126,6 +126,14 @@
           <t hangText="Length"><vspace/>
             The length of the extension field, which is 28 octets.</t>
 
+          <t hangText="Origin Correction"><vspace/>
+            A field which contains a copy of the final delay correction from
+            the previous packet in the NTP exchange.</t>
+
+          <t hangText="Origin ID"><vspace/>
+            A field which contains a copy of the final path ID from the
+            previous packet in the NTP exchange.</t>
+
           <t hangText="Receive Correction"><vspace/>
             An 8-bit extension of the receive timestamp in the NTP header
             increasing its resolution. The extended receive timestamp has 32
@@ -136,19 +144,12 @@
             increasing its resolution. The extended transmit timestamp has 32
             integer bits and 40 fractional bits.</t>
 
-          <t hangText="Origin Correction"><vspace/>
-            A field which contains a copy of the final delay correction from
-            the previous packet in the NTP exchange.</t>
-
-          <t hangText="Origin ID"><vspace/>
-            A field which contains a copy of the final path ID from the
-            previous packet in the NTP exchange.</t>
-
           <t hangText="Delay Correction"><vspace/>
-            A signed fixed-point number of seconds with 8 integer bits and 40
-            fractional bits, which represents the current correction of the
+            A signed fixed-point number of nanoseconds with 48 integer bits and
+            16 fractional bits, which represents the current correction of the
             network delay that has accumulated for this packet on the path from
-            the source to the destination.</t>
+            the source to the destination. The format of this field is identical
+            to the PTP correctionField.</t>
 
           <t hangText="Path ID"><vspace/>
             A 16-bit identification number of the path where the delay
@@ -236,10 +237,11 @@
         transmit timestamp from the NTP header with the additional bits from
         the receive and transmit correction fields respectively.</t>
 
-      <t>When the client computes the offset and delay using the formulas from
-        RFC 5905, the origin correction is subtracted from the receive
-        timestamp and the delay correction is added to the transmit
-        timestamp.</t>
+      <t>When the client calculates the offset and delay using the formulas from
+        RFC 5905, the origin correction is subtracted from the receive timestamp
+        and the delay correction is added to the transmit timestamp. A
+        conversion is necessary as the corrections are in different units than
+        the timestamps (nanoseconds vs seconds).</t>
 
       <t>An NTP peer follows the rules of both servers and clients. It
         processes Correction Fields in received packets as a client and sends
