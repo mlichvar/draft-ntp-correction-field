@@ -15,7 +15,7 @@
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
 
-<rfc category="exp" docName="draft-mlichvar-ntp-correction-field-02" ipr="trust200902">
+<rfc category="exp" docName="draft-mlichvar-ntp-correction-field-03" ipr="trust200902">
   <front>
     <title>NTP Correction Field</title>
 
@@ -33,7 +33,7 @@
       </address>
     </author>
 
-    <date year="2018" month="June" day="18"/>
+    <date year="2018" month="October" day="1"/>
 
     <area>General</area>
 
